@@ -41,10 +41,11 @@ public class LevelsGridAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.row_item, null);
         }
 
-        ImageView imageView = convertView.findViewById(R.id.image_view);
+        //ImageView imageView = convertView.findViewById(R.id.image_view);
         TextView textView = convertView.findViewById(R.id.text_view);
 
-        imageView.setImageResource(R.drawable.opened);
+        //imageView.setImageResource(R.drawable.opened);
+        textView.setBackgroundResource(R.drawable.opened);
         textView.setText("Lvl "+position);
 
         return convertView;
