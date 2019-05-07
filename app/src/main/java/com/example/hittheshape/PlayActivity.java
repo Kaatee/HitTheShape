@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,16 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
         shapeButton = (Button)findViewById(R.id.shape);
+        Button shapeButton = findViewById(R.id.shape);
+
+
+        //set image background
+        shapeButton.setBackgroundResource(R.drawable.shape3);
+
+        //set shape size
+        int size = (int) getScreenWidth()/8; //set size as 1/8 screen width size
+        shapeButton.getLayoutParams().height = size;
+        shapeButton.getLayoutParams().width = size;
     }
 
     private static int getScreenWidth() {
