@@ -1,6 +1,7 @@
 package com.example.hittheshape;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -44,18 +45,21 @@ public class LevelsGridAdapter extends BaseAdapter {
         }
 
         ImageView imageView = convertView.findViewById(R.id.image_view);
-        imageView.setImageResource(R.drawable.opened);
 
-        //int h = imageView.getLayoutParams().height;
-        //int w = imageView.getLayoutParams().width;
+        //TODO set proper image to unlocked und locked lvl
+        if(position<10) {
+            imageView.setImageResource(R.drawable.opened);
+        }
+        else {
+            imageView.setImageResource(R.drawable.locked);
+            imageView.setAlpha(0.6f);
+        }
 
-        //Log.d("myLog", h+" "+w);
 
         TextView textView = convertView.findViewById(R.id.text_view);
 
-        //textView.setBackgroundResource(R.drawable.opened);
-
-        textView.setText("Lvl "+position);
+        //textView.setText("lvl "+ position);
+        textView.setText(""+position);
 
         return convertView;
     }

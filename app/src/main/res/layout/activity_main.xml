@@ -32,12 +32,26 @@
                 android:id="@+id/buttonPlay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/button_shadow_drawable"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="25dp"
                 android:text="Play" />
 
             <Button
                 android:id="@+id/buttonSettings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/button_shadow_drawable"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="25dp"
                 android:text="Settings" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
