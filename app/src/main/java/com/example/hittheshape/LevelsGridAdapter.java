@@ -1,6 +1,8 @@
 package com.example.hittheshape;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,11 +43,18 @@ public class LevelsGridAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.row_item, null);
         }
 
-        //ImageView imageView = convertView.findViewById(R.id.image_view);
+        ImageView imageView = convertView.findViewById(R.id.image_view);
+        imageView.setImageResource(R.drawable.opened);
+
+        //int h = imageView.getLayoutParams().height;
+        //int w = imageView.getLayoutParams().width;
+
+        //Log.d("myLog", h+" "+w);
+
         TextView textView = convertView.findViewById(R.id.text_view);
 
-        //imageView.setImageResource(R.drawable.opened);
-        textView.setBackgroundResource(R.drawable.opened);
+        //textView.setBackgroundResource(R.drawable.opened);
+
         textView.setText("Lvl "+position);
 
         return convertView;
