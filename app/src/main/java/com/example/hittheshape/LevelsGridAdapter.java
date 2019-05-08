@@ -20,6 +20,20 @@ public class LevelsGridAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        // according to position return here true or false to enable or disable respectively
+        if(position==0){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int getCount() {
         return 50;
     }
@@ -47,19 +61,18 @@ public class LevelsGridAdapter extends BaseAdapter {
         ImageView imageView = convertView.findViewById(R.id.image_view);
 
         //TODO set proper image to unlocked und locked lvl
-        if(position<10) {
+        if(position<1) {
             imageView.setImageResource(R.drawable.opened);
         }
         else {
             imageView.setImageResource(R.drawable.locked);
             imageView.setAlpha(0.6f);
+
         }
 
 
         TextView textView = convertView.findViewById(R.id.text_view);
-
-        //textView.setText("lvl "+ position);
-        textView.setText(""+position);
+        textView.setText(Integer.toString(position+1));
 
         return convertView;
     }
