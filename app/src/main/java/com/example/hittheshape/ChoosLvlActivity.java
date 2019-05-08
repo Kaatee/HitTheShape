@@ -10,15 +10,21 @@ import android.widget.Toast;
 
 public class ChoosLvlActivity extends AppCompatActivity {
     private GridView levelsGidView;
+    private int levelNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choos_lvl);
 
+        if(getIntent()!=null){
+            levelNo=getIntent().getIntExtra("levelNo", 0);
+            //Toast.makeText(this, Integer.toString(levelNo), Toast.LENGTH_LONG).show();
+        }
+
         levelsGidView = findViewById(R.id.gridViewLevels);
 
-        LevelsGridAdapter adapter = new LevelsGridAdapter(ChoosLvlActivity.this);
+        LevelsGridAdapter adapter = new LevelsGridAdapter(ChoosLvlActivity.this,levelNo);
         levelsGidView.setAdapter(adapter);
 
 
@@ -28,6 +34,7 @@ public class ChoosLvlActivity extends AppCompatActivity {
                 //Toast.makeText(getApplicationContext(), "You choosed "+position+ ". lvl", Toast.LENGTH_LONG).show();
 
                 Intent intent = new Intent(view.getContext(), PlayActivity.class);
+                intent.putExtra("levelNo", position+1);
                 startActivity(intent);
             }
         });

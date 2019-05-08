@@ -25,14 +25,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        buttonSettings = findViewById(R.id.buttonSettings);
-        buttonSettings.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View v) {
-                openSettingsActivity();
-            }
-        });
+//        buttonSettings = findViewById(R.id.buttonSettings);
+//        buttonSettings.setOnClickListener(new View.OnClickListener(){
+//
+//            @Override
+//            public void onClick(View v) {
+//                openSettingsActivity();
+//            }
+//        });
     }
 
     public void openChooseLvLActivity(){
@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void openSettingsActivity(){
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-    }
+//    public void openSettingsActivity(){
+//        Intent intent = new Intent(this, SettingsActivity.class);
+//        startActivity(intent);
+//    }
 
 
 }

@@ -25,6 +25,7 @@ public class PlayActivity extends AppCompatActivity {
     private int points=0;
     private Context context;
     private boolean clicked=false;
+    private int levelNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,11 @@ public class PlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play);
         shapeButton = (Button)findViewById(R.id.shape);
         Button shapeButton = findViewById(R.id.shape);
+
+        if(getIntent()!=null){
+            levelNo=getIntent().getIntExtra("levelNo", 0);
+            Toast.makeText(this, "Level No: " +Integer.toString(levelNo), Toast.LENGTH_SHORT).show();
+        }
 
         //set image background
         shapeButton.setBackgroundResource(R.drawable.shape3);
@@ -82,14 +88,14 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if(clicked) {
-                    handler.postDelayed(this, TemporaryConfiguration.checkClick);
+                    handler.postDelayed(this, TemporaryConfiguration.checkClick[levelNo]);
                     clicked=false;
                 }
                 else {
                     showDialog();
                 }
             }
-        }, TemporaryConfiguration.checkClick);
+        }, TemporaryConfiguration.checkClick[levelNo]);
     }
 
     private void showDialog(){
@@ -102,6 +108,7 @@ public class PlayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // Do nothing but close the dialog
                         Intent intent = new Intent(context, PlayActivity.class);
+                        intent.putExtra("levelNo", levelNo);
                         startActivity(intent);
                         dialog.dismiss();
                     }
@@ -111,6 +118,7 @@ public class PlayActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(context, ChoosLvlActivity.class);
+                        intent.putExtra("levelNo", levelNo);
                         startActivity(intent);
                         // Do nothing
                         dialog.dismiss();
@@ -140,13 +148,6 @@ public class PlayActivity extends AppCompatActivity {
         return 0;
     }
 
-    private int convertDpToPx(float valueDp){
-
-        float density = getResources().getDisplayMetrics().density;
-        float px = valueDp * density;
-        return (int)px;
-
-    }
 
     private int getStatusBarHeight() {
         int result = 0;
@@ -159,12 +160,15 @@ public class PlayActivity extends AppCompatActivity {
 
     
     private void updateTextView() {
-        if(points<TemporaryConfiguration.pointsToWinLv1){
+        if(points<TemporaryConfiguration.pointsToWinLevel[levelNo]){
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(Integer.toString(points));
         }
         else{
-            Toast.makeText(this, "You win level! Congrats!", Toast.LENGTH_LONG).show();
+            //start next level
+            Intent intent = new Intent(this, PlayActivity.class);
+            intent.putExtra("levelNo", levelNo+1);
+            startActivity(intent);
         }
 
     }
@@ -192,7 +196,7 @@ public class PlayActivity extends AppCompatActivity {
                 shapeButton.setVisibility(View.VISIBLE);
                 shapeButton.setClickable(true);
             }
-    }, TemporaryConfiguration.nextShapeAppear);
+    }, TemporaryConfiguration.nextShapeAppear[levelNo]);
 
 
     }
