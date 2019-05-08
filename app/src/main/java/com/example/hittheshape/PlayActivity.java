@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +30,8 @@ public class PlayActivity extends AppCompatActivity {
     private Context context;
     private boolean clicked=false;
     private int levelNo;
+    int size;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +40,27 @@ public class PlayActivity extends AppCompatActivity {
         shapeButton = (Button)findViewById(R.id.shape);
         Button shapeButton = findViewById(R.id.shape);
 
+
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 0);
-            Toast.makeText(this, "Level No: " +Integer.toString(levelNo), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Level No: " +Integer.toString(levelNo), Toast.LENGTH_SHORT).show();
         }
 
-        //set image background
-        shapeButton.setBackgroundResource(R.drawable.shape3);
+        //set image background - different in each level (shape0-shape4)
+        int mod = levelNo%5;
+        String variableValue = "shape"+mod;
+        shapeButton.setBackgroundResource(getResources().getIdentifier(variableValue, "drawable", getPackageName()));
+
+        //shapeButton.setBackgroundResource(R.drawable.shape1);
 
         //set shape size
-        int size = (int) getScreenWidth()/TemporaryConfiguration.shapeSize; //set size as 1/8 screen width size
+        size = (int) getScreenWidth()/TemporaryConfiguration.shapeSize; //set size as 1/8 screen width size
         shapeButton.getLayoutParams().height = size;
         shapeButton.getLayoutParams().width = size;
+
+        //Animation - rotate
+        Animation an = prepareAnimation((int) size/2, (int) size/2);
+        shapeButton.startAnimation(an);
 
         context=this;
 
@@ -83,15 +98,18 @@ public class PlayActivity extends AppCompatActivity {
 //                alert.show();
 //            }
 //        }, TemporaryConfiguration.roundTime);
-        final Handler handler = new Handler();
+        handler = new Handler();
+        //handler.removeCallbacksAndMessages(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if(clicked) {
                     handler.postDelayed(this, TemporaryConfiguration.checkClick[levelNo]);
                     clicked=false;
+                    //handler.removeCallbacksAndMessages(null);
                 }
                 else {
+                    //handler.removeCallbacksAndMessages(null);
                     showDialog();
                 }
             }
@@ -109,6 +127,7 @@ public class PlayActivity extends AppCompatActivity {
                         // Do nothing but close the dialog
                         Intent intent = new Intent(context, PlayActivity.class);
                         intent.putExtra("levelNo", levelNo);
+                       // handler.removeCallbacksAndMessages(null);
                         startActivity(intent);
                         dialog.dismiss();
                     }
@@ -119,6 +138,7 @@ public class PlayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(context, ChoosLvlActivity.class);
                         intent.putExtra("levelNo", levelNo);
+                        //handler.removeCallbacksAndMessages(null);
                         startActivity(intent);
                         // Do nothing
                         dialog.dismiss();
@@ -166,11 +186,22 @@ public class PlayActivity extends AppCompatActivity {
         }
         else{
             //start next level
-            Intent intent = new Intent(this, PlayActivity.class);
-            intent.putExtra("levelNo", levelNo+1);
-            startActivity(intent);
-        }
+            //show gratulation dialog and start new lvl after pressing "OK"
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Congratulation! You finished lvl "+levelNo)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(context, PlayActivity.class);
+                            intent.putExtra("levelNo", levelNo+1);
 
+                            //handler.removeCallbacksAndMessages(null);
+                            startActivity(intent);
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
     }
 
 
@@ -189,15 +220,35 @@ public class PlayActivity extends AppCompatActivity {
         shapeButton.setX(newX);
         shapeButton.setY(newY);
 
-        Handler handler = new Handler();
+        int animationCenterX = (int) (newX + size/2);
+        int animationCenterY = (int) (newY + size/2);
+
+        //Animation - rotate
+        Animation an = prepareAnimation(animationCenterX, animationCenterY);
+        shapeButton.startAnimation(an);
+
+        handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 shapeButton.setVisibility(View.VISIBLE);
                 shapeButton.setClickable(true);
+                //handler.removeCallbacksAndMessages(null);
             }
     }, TemporaryConfiguration.nextShapeAppear[levelNo]);
 
 
+    }
+
+    private Animation prepareAnimation(int x, int y){
+        Animation an = new RotateAnimation(0.0f, 360.0f, x,  y );
+
+        an.setInterpolator(new LinearInterpolator());
+        an.setDuration(2000);               // duration in ms
+        an.setRepeatCount(-1);               // -1 = infinite repeated
+        an.setRepeatMode(Animation.INFINITE);
+        an.setFillAfter(true);
+
+        return an;
     }
 }
