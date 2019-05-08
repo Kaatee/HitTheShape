@@ -28,10 +28,10 @@ public class PlayActivity extends AppCompatActivity {
     private Button shapeButton;
     private int points=0;
     private Context context;
-    private boolean clicked=false;
+    private volatile boolean  clicked=false;
     private int levelNo;
     int size;
-    private Handler handler;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +40,8 @@ public class PlayActivity extends AppCompatActivity {
         shapeButton = (Button)findViewById(R.id.shape);
         Button shapeButton = findViewById(R.id.shape);
 
-
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 0);
-            //Toast.makeText(this, "Level No: " +Integer.toString(levelNo), Toast.LENGTH_SHORT).show();
         }
 
         //set image background - different in each level (shape0-shape4)
@@ -51,7 +49,6 @@ public class PlayActivity extends AppCompatActivity {
         String variableValue = "shape"+mod;
         shapeButton.setBackgroundResource(getResources().getIdentifier(variableValue, "drawable", getPackageName()));
 
-        //shapeButton.setBackgroundResource(R.drawable.shape1);
 
         //set shape size
         size = (int) getScreenWidth()/TemporaryConfiguration.shapeSize; //set size as 1/8 screen width size
@@ -64,49 +61,15 @@ public class PlayActivity extends AppCompatActivity {
 
         context=this;
 
-        //measure round time
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//
-//                builder.setTitle("Time is over");
-//                builder.setMessage("Do you want to play again this level?");
-//
-//                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        // Do nothing but close the dialog
-//                        Intent intent = new Intent(context, PlayActivity.class);
-//                        startActivity(intent);
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Intent intent = new Intent(context, MainActivity.class);
-//                        startActivity(intent);
-//                        // Do nothing
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                AlertDialog alert = builder.create();
-//                alert.setCanceledOnTouchOutside(false);
-//                alert.show();
-//            }
-//        }, TemporaryConfiguration.roundTime);
-        handler = new Handler();
-        //handler.removeCallbacksAndMessages(null);
+        handler.removeCallbacksAndMessages(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                handler.removeCallbacksAndMessages(null);
                 if(clicked) {
+                    //handler.removeCallbacksAndMessages(null);
                     handler.postDelayed(this, TemporaryConfiguration.checkClick[levelNo]);
                     clicked=false;
-                    //handler.removeCallbacksAndMessages(null);
                 }
                 else {
                     //handler.removeCallbacksAndMessages(null);
@@ -118,7 +81,7 @@ public class PlayActivity extends AppCompatActivity {
 
     private void showDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
+        handler.removeCallbacksAndMessages(null);
                 builder.setTitle("Time is over");
                 builder.setMessage("Do you want to play again this level?");
 
@@ -127,7 +90,8 @@ public class PlayActivity extends AppCompatActivity {
                         // Do nothing but close the dialog
                         Intent intent = new Intent(context, PlayActivity.class);
                         intent.putExtra("levelNo", levelNo);
-                       // handler.removeCallbacksAndMessages(null);
+
+                        handler.removeCallbacksAndMessages(null);
                         startActivity(intent);
                         dialog.dismiss();
                     }
@@ -138,7 +102,8 @@ public class PlayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(context, ChoosLvlActivity.class);
                         intent.putExtra("levelNo", levelNo);
-                        //handler.removeCallbacksAndMessages(null);
+
+                        handler.removeCallbacksAndMessages(null);
                         startActivity(intent);
                         // Do nothing
                         dialog.dismiss();
@@ -180,6 +145,7 @@ public class PlayActivity extends AppCompatActivity {
 
     
     private void updateTextView() {
+
         if(points<TemporaryConfiguration.pointsToWinLevel[levelNo]){
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(Integer.toString(points));
@@ -187,7 +153,11 @@ public class PlayActivity extends AppCompatActivity {
         else{
             //start next level
             //show gratulation dialog and start new lvl after pressing "OK"
+            handler.removeCallbacksAndMessages(null);
+            TextView textView = (TextView) findViewById(R.id.textView);
+            textView.setText(Integer.toString(points));
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
             builder.setMessage("Congratulation! You finished lvl "+levelNo)
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -195,7 +165,6 @@ public class PlayActivity extends AppCompatActivity {
                             Intent intent = new Intent(context, PlayActivity.class);
                             intent.putExtra("levelNo", levelNo+1);
 
-                            //handler.removeCallbacksAndMessages(null);
                             startActivity(intent);
                         }
                     });
@@ -227,13 +196,12 @@ public class PlayActivity extends AppCompatActivity {
         Animation an = prepareAnimation(animationCenterX, animationCenterY);
         shapeButton.startAnimation(an);
 
-        handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 shapeButton.setVisibility(View.VISIBLE);
                 shapeButton.setClickable(true);
-                //handler.removeCallbacksAndMessages(null);
             }
     }, TemporaryConfiguration.nextShapeAppear[levelNo]);
 
