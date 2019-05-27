@@ -1,9 +1,6 @@
 package com.example.hittheshape;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +35,7 @@ public class LevelsGridAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return TemporaryConfiguration.numberOfLevels;
+        return Configuration.numberOfLevels;
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Animation;
@@ -20,7 +21,7 @@ import java.util.Random;
 
 public class PlayActivity extends AppCompatActivity {
 
-    private Button shapeButton;
+    private Button allowedShapeButton;
     private Button forbiddenShapeButton;
     private int points=0;
     private Context context;
@@ -31,58 +32,137 @@ public class PlayActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Handler buttonHandler = new Handler();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-        shapeButton = (Button)findViewById(R.id.shape);
-        forbiddenShapeButton= (Button)findViewById(R.id.forbiddenshape);
 
+        //check current level number
         if(getIntent()!=null){
-            levelNo=getIntent().getIntExtra("levelNo", 0);
+            levelNo=getIntent().getIntExtra("levelNo", 1);
         }
 
-        //set image background - different in each level (shape0-shape4)
-        int mod = levelNo%5;
-        String variableValue = "shape"+mod;
-        shapeButton.setBackgroundResource(getResources().getIdentifier(variableValue, "drawable", getPackageName()));
+        allowedShapeButton = (Button)findViewById(R.id.shape);
+        forbiddenShapeButton= (Button)findViewById(R.id.forbiddenshape);
+
+        setShapeRoundImage();
+
+        formatShapes();
+
+        //check forbidden shape in first move
+        if (randWithGivenProbability(Configuration.probabilityOfForbiddenShapeInRound[levelNo])) {
+            enableForbiddenShape();
+        } else {
+            disableForbiddenShape();
+        }
 
 
-        //set shape size
-        size = (int) getScreenWidth()/TemporaryConfiguration.shapeSize; //set size as 1/8 screen width size
-        shapeButton.getLayoutParams().height = size;
-        shapeButton.getLayoutParams().width = size;
+        //TODO ANIMATION HERE
 
 
-        forbiddenShapeButton.getLayoutParams().height = size;
-        forbiddenShapeButton.getLayoutParams().width = size;
-
-        //Animation - rotate
-        Animation an = prepareAnimation((int) size/2, (int) size/2);
-        shapeButton.startAnimation(an);
-        //forbiddenShapeButton.startAnimation(an);
-
+        //handler check for every Configuration.checkClick[levelNo] click
         context=this;
+        measureTimeForNextClick();
+    }
 
+    public void hitAllowedShape(View view) {
+        disableShape();
+
+        //update points
+        points+=1;
+        updateDisplayPoints();
+        clicked=true;
+
+        //check end of current round
+        if (points< Configuration.pointsToWinLevel[levelNo] ) {
+
+            drawAllowedShapeAtNewPosition();
+
+            if (randWithGivenProbability(Configuration.probabilityOfForbiddenShapeInRound[levelNo])) {
+               drawForbiddenShapeAtNewPosition();
+            } else {
+                disableForbiddenShape();
+            }
+
+            //TODO ANIMATION HERE
+
+            buttonHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    enableAllowedShape();
+                }
+            }, Configuration.nextShapeAppear[levelNo]);
+        }
+    }
+
+    public void hitForbiddenShape(View view){
+        showLostRoundStatement();
+    }
+
+    private void measureTimeForNextClick(){
         handler.removeCallbacksAndMessages(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 handler.removeCallbacksAndMessages(null);
                 if(clicked) {
-                    handler.postDelayed(this, TemporaryConfiguration.checkClick[levelNo]);
+                    handler.postDelayed(this, Configuration.checkClick[levelNo]);
                     clicked=false;
                 }
                 else if(!clicked && !endLevel){
-                    showDialog();
+                    showLostRoundStatement();
                 }
             }
-        }, TemporaryConfiguration.checkClick[levelNo]);
+        }, Configuration.checkClick[levelNo]);
+    }
+
+    private void drawAllowedShapeAtNewPosition(){
+        Random r = new Random();
+        int newAllowedShapePositionX = r.nextInt(getScreenWidth() - allowedShapeButton.getWidth() - 20) + 10;
+        int newAllowedShapePositionY = r.nextInt(getScreenHeight() - allowedShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+
+        allowedShapeButton.setX(newAllowedShapePositionX);
+        allowedShapeButton.setY(newAllowedShapePositionY);
+    }
+
+    private void drawForbiddenShapeAtNewPosition(){
+        Random r = new Random();
+        int newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 20) + 10;
+        int newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+
+        //check overlapping
+        while (allowedShapeButton.getX()- size <= newForbiddenShapePositionX && newForbiddenShapePositionX <= allowedShapeButton.getX() + size && allowedShapeButton.getY() - size <= newForbiddenShapePositionY && newForbiddenShapePositionY <= allowedShapeButton.getY() + size) {
+            newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 20) + 10;
+            newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+        }
+
+        forbiddenShapeButton.setX(newForbiddenShapePositionX);
+        forbiddenShapeButton.setY(newForbiddenShapePositionY);
 
     }
 
-    private void showDialog(){
+    private void formatShapes(){
+        //set shape size
+        size = (int) getScreenWidth()/ Configuration.shapeSize; //set size as 1/8 screen width size
+        allowedShapeButton.getLayoutParams().height = size;
+        allowedShapeButton.getLayoutParams().width = size;
 
+
+        forbiddenShapeButton.getLayoutParams().height = size;
+        forbiddenShapeButton.getLayoutParams().width = size;
+    }
+
+    private void setShapeRoundImage(){
+        //set image background - different in each level (shape0-shape4)
+        int mod = levelNo%5;
+        String variableValue = "shape"+mod;
+        allowedShapeButton.setBackgroundResource(getResources().getIdentifier(variableValue, "drawable", getPackageName()));
+    }
+
+    private void showLostRoundStatement(){
+        disableShape();
+        disableForbiddenShape();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("You lose :( !");
@@ -145,16 +225,20 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     
-    private void updateDisplayPoints(View view) {
+    private void updateDisplayPoints() {
 
-        if(points<TemporaryConfiguration.pointsToWinLevel[levelNo]){
+        if(points< Configuration.pointsToWinLevel[levelNo]){
         TextView textView = (TextView) findViewById(R.id.textView);
         textView.setText(Integer.toString(points));
         }
         else{
             //start next level
             //show gratulation dialog and start new lvl after pressing "OK"
+
             endLevel=true;
+            disableShape();
+            disableForbiddenShape();
+
             TextView textView = (TextView) findViewById(R.id.textView);
             textView.setText(Integer.toString(points));
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -169,84 +253,52 @@ public class PlayActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     });
+
             AlertDialog alert = builder.create();
             alert.show();
         }
     }
 
 
-    public void hitTheShape(View view) {
-        shapeButton.setClickable(false);
-        shapeButton.setVisibility(View.INVISIBLE);
-
-        points+=1;
-        updateDisplayPoints(view);
-        clicked=true;
-
-        Random r = new Random();
-        int newX= r.nextInt(getScreenWidth()-shapeButton.getWidth()-20)+10;
-        int newY = r.nextInt(getScreenHeight()-shapeButton.getHeight()-getNavigationBarHeight()-getStatusBarHeight()-20)+10;
-
-        shapeButton.setX(newX);
-        shapeButton.setY(newY);
-
-        Random r1 = new Random();
-        int newForbiddenX=r1.nextInt(getScreenWidth()-forbiddenShapeButton.getWidth()-20)+10;
-        int newForbiddenY=r1.nextInt(getScreenHeight()-forbiddenShapeButton.getHeight()-getNavigationBarHeight()-getStatusBarHeight()-20)+10;
-
-        while(newX-size<=newForbiddenX && newForbiddenX<=newX+size && newY-size<=newForbiddenY && newForbiddenY<=newY+size){
-            newForbiddenX=r1.nextInt(getScreenWidth()-forbiddenShapeButton.getWidth()-20)+10;
-            newForbiddenY=r1.nextInt(getScreenHeight()-forbiddenShapeButton.getHeight()-getNavigationBarHeight()-getStatusBarHeight()-20)+10;
+    private boolean randWithGivenProbability(int probability) {
+        int leftLimit = 1;
+        int rightLimit = 100;
+        int generatedInteger = leftLimit + (int) (new Random().nextFloat() * (rightLimit - leftLimit));
+        if(probability>=generatedInteger) return true;
+        else{
+            return false;
         }
-
-
-        forbiddenShapeButton.setX(newForbiddenX);
-        forbiddenShapeButton.setY(newForbiddenY);
-
-        int animationCenterX = (int) (newX + size/2);
-        int animationCenterY = (int) (newY + size/2);
-
-//        int animationCenterX2 = (int) (newForbiddenX + size/2);
-//        int animationCenterY2 = (int) (newForbiddenY + size/2);
-//
-//        //Animation - rotate
-//        Animation an1 = prepareAnimation(animationCenterX2, animationCenterY2);
-//        forbiddenShapeButton.startAnimation(an1);
-
-        //Animation - rotate
-        Animation an = prepareAnimation(animationCenterX, animationCenterY);
-        shapeButton.startAnimation(an);
-
-
-        buttonHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                shapeButton.setVisibility(View.INVISIBLE);
-                shapeButton.setClickable(true);
-            }
-        }, TemporaryConfiguration.nextShapeAppear[levelNo]);
-
     }
 
-    public void hitForbiddenShape(View view){
-        shapeButton.setClickable(false);
-        shapeButton.setVisibility(View.INVISIBLE);
+
+    private void disableForbiddenShape(){
         forbiddenShapeButton.setClickable(false);
         forbiddenShapeButton.setVisibility(View.INVISIBLE);
-
-         showDialog();
+    }
+    private void enableForbiddenShape(){
+        forbiddenShapeButton.setVisibility(View.VISIBLE);
+        forbiddenShapeButton.setClickable(true);
+    }
+    private void enableAllowedShape(){
+        allowedShapeButton.setVisibility(View.VISIBLE);
+        allowedShapeButton.setClickable(true);
+    }
+    private void disableShape(){
+        allowedShapeButton.setClickable(false);
+        allowedShapeButton.setVisibility(View.INVISIBLE);
     }
 
+
     private Animation prepareAnimation(int x, int y){
-        Animation an = new RotateAnimation(0.0f, 360.0f, x,  y );
+        Animation animation = new RotateAnimation(0.0f, 360.0f, x,  y );
 
-        an.setInterpolator(new LinearInterpolator());
-        an.setDuration(2000);               // duration in ms
-        an.setRepeatCount(-1);               // -1 = infinite repeated
-        an.setRepeatMode(Animation.INFINITE);
-        an.setFillAfter(true);
+        animation.setInterpolator(new LinearInterpolator());
+        animation.setDuration(2000);               // duration in ms
+        animation.setRepeatCount(-1);               // -1 = infinite repeated
+        animation.setRepeatMode(Animation.INFINITE);
+        animation.setFillAfter(true);
 
-        return an;
+        return animation;
     }
 
 
