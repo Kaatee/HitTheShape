@@ -30,7 +30,7 @@ public class PlayActivity extends AppCompatActivity {
     private int levelNo;
     private int size;
     private Handler handler = new Handler();
-    private Handler buttonHandler = new Handler();
+
 
 
     @Override
@@ -86,13 +86,8 @@ public class PlayActivity extends AppCompatActivity {
             }
 
             //TODO ANIMATION HERE
+            enableAllowedShape();
 
-            buttonHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    enableAllowedShape();
-                }
-            }, Configuration.nextShapeAppear[levelNo]);
         }
     }
 
@@ -306,7 +301,7 @@ public class PlayActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
-        buttonHandler.removeCallbacksAndMessages(null);
+
     }
 
 }
