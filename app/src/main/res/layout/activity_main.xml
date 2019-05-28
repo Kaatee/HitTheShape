@@ -26,19 +26,20 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/logo" />
+                app:srcCompat="@drawable/miser" />
 
             <Button
                 android:id="@+id/buttonPlay"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button_shadow_drawable"
+                android:layout_height="55dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
+                android:background="@drawable/eooden_board"
                 android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
+                android:textColor="#000"
                 android:textSize="25dp"
+                android:fontFamily="sans-serif-medium"
                 android:text="Play" />
 
         </LinearLayout>

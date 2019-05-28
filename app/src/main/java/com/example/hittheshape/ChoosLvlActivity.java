@@ -11,6 +11,7 @@ import android.widget.Toast;
 public class ChoosLvlActivity extends AppCompatActivity {
     private GridView levelsGidView;
     private int levelNo;
+    private int lives;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,8 @@ public class ChoosLvlActivity extends AppCompatActivity {
 
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 0);
+            lives =getIntent().getIntExtra("lives", 3);
+
             //Toast.makeText(this, Integer.toString(levelNo), Toast.LENGTH_LONG).show();
         }
 
@@ -35,6 +38,7 @@ public class ChoosLvlActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(view.getContext(), PlayActivity.class);
                 intent.putExtra("levelNo", position+1);
+                intent.putExtra("lives", lives);
                 startActivity(intent);
             }
         });

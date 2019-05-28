@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Random;
@@ -30,7 +32,9 @@ public class PlayActivity extends AppCompatActivity {
     private volatile boolean  endLevel =false;
     private int levelNo;
     private int size;
+    private int lives;
     private Handler handler = new Handler();
+    private ImageView[] livesViews;
 
 
 
@@ -39,13 +43,24 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+
         //check current level number
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 1);
+            lives = getIntent().getIntExtra("lives", 3);
         }
 
         allowedShapeButton = (GifImageView)findViewById(R.id.shape);
         forbiddenShapeButton= (GifImageView)findViewById(R.id.forbiddenshape);
+        livesViews = new ImageView[] {findViewById(R.id.heart1), findViewById(R.id.heart2), findViewById(R.id.heart3)};
+
+        //Log.e("haha", lives+" ");
+        for(int i=0; i<3; i++){
+            if(i>=lives){
+                livesViews[i].setVisibility(View.INVISIBLE);
+            }
+        }
+
 
         setShapeRoundImage();
 
@@ -57,10 +72,6 @@ public class PlayActivity extends AppCompatActivity {
         } else {
             disableForbiddenShape();
         }
-
-
-        //TODO ANIMATION HERE
-
 
         //handler check for every Configuration.checkClick[levelNo] click
         context=this;
@@ -86,14 +97,24 @@ public class PlayActivity extends AppCompatActivity {
                 disableForbiddenShape();
             }
 
-            //TODO ANIMATION HERE
             enableAllowedShape();
 
         }
     }
 
     public void hitForbiddenShape(View view){
-        showLostRoundStatement();
+        lives--;
+        if(lives<=0) {
+           // Log.e("hehe", "forbidden: lives<0, pokazuje okno");
+            showLostRoundStatement();
+        }
+        else{
+            handler.removeCallbacksAndMessages(null); ///////
+            Intent intent = new Intent(context, PlayActivity.class);
+            intent.putExtra("levelNo", levelNo);
+            intent.putExtra("lives", lives);
+            startActivity(intent);
+        }
     }
 
     private void measureTimeForNextClick(){
@@ -107,7 +128,22 @@ public class PlayActivity extends AppCompatActivity {
                     clicked=false;
                 }
                 else if(!clicked && !endLevel){
-                    showLostRoundStatement();
+                    lives--;
+                    if(lives>=0) {
+                        livesViews[lives].setVisibility(View.INVISIBLE);
+                    }
+                    if(lives<=0) {
+                        //Log.e("hehe", "lives<0, pokazuje okno");
+                        showLostRoundStatement();
+                    }
+                    else{
+                        //Log.e("hehe", "Nie pokazuje okna");
+                        handler.removeCallbacksAndMessages(null); //////
+                        Intent intent = new Intent(context, PlayActivity.class);
+                        intent.putExtra("levelNo", levelNo);
+                        intent.putExtra("lives", lives);
+                        startActivity(intent);
+                    }
                 }
             }
         }, Configuration.checkClick[levelNo]);
@@ -160,7 +196,6 @@ public class PlayActivity extends AppCompatActivity {
     private void showLostRoundStatement(){
         disableShape();
         disableForbiddenShape();
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("You lose :( !");
                 builder.setMessage("Do you want to play again this level?");
@@ -170,6 +205,8 @@ public class PlayActivity extends AppCompatActivity {
                         // Do nothing but close the dialog
                         Intent intent = new Intent(context, PlayActivity.class);
                         intent.putExtra("levelNo", levelNo);
+                        intent.putExtra("lives", lives);
+                        //Log.e("haha", lives+" ");
 
                         startActivity(intent);
                         dialog.dismiss();
@@ -181,6 +218,7 @@ public class PlayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(context, ChoosLvlActivity.class);
                         intent.putExtra("levelNo", levelNo);
+                        intent.putExtra("lives", lives);
 
                         startActivity(intent);
                         // Do nothing
@@ -246,6 +284,7 @@ public class PlayActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent intent = new Intent(context, PlayActivity.class);
                             intent.putExtra("levelNo", levelNo+1);
+                            intent.putExtra("lives", lives);
 
                             startActivity(intent);
                         }
@@ -303,7 +342,6 @@ public class PlayActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
-
     }
 
 }
