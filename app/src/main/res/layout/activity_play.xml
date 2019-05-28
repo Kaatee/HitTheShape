@@ -5,32 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/glass"
+    android:background="@drawable/wood"
     tools:context=".PlayActivity">
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="45dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:background="@drawable/points_background"
+        android:layout_marginBottom="0dp"
         android:text="0"
-        android:textSize="40dp"
+        android:textAlignment="center"
+        android:layout_gravity="bottom"
+        android:textColor="#fff"
+        android:textSize="30dp"
         android:textStyle="bold"
-        android:textColor="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/shape"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape1"
+        android:background="@drawable/shape0"
         android:onClick="hitAllowedShape"
         tools:layout_editor_absoluteX="59dp"
         tools:layout_editor_absoluteY="86dp" />
 
-    <Button
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/forbiddenshape"
         android:layout_width="175dp"
         android:layout_height="196dp"

@@ -4,11 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.Animation;
@@ -19,10 +18,12 @@ import android.widget.TextView;
 
 import java.util.Random;
 
+import pl.droidsonroids.gif.GifImageView;
+
 public class PlayActivity extends AppCompatActivity {
 
-    private Button allowedShapeButton;
-    private Button forbiddenShapeButton;
+    private GifImageView allowedShapeButton;
+    private GifImageView forbiddenShapeButton;
     private int points=0;
     private Context context;
     private volatile boolean  clicked =false;
@@ -43,8 +44,8 @@ public class PlayActivity extends AppCompatActivity {
             levelNo=getIntent().getIntExtra("levelNo", 1);
         }
 
-        allowedShapeButton = (Button)findViewById(R.id.shape);
-        forbiddenShapeButton= (Button)findViewById(R.id.forbiddenshape);
+        allowedShapeButton = (GifImageView)findViewById(R.id.shape);
+        forbiddenShapeButton= (GifImageView)findViewById(R.id.forbiddenshape);
 
         setShapeRoundImage();
 
@@ -150,8 +151,9 @@ public class PlayActivity extends AppCompatActivity {
 
     private void setShapeRoundImage(){
         //set image background - different in each level (shape0-shape4)
-        int mod = levelNo%5;
+        int mod = levelNo%4;
         String variableValue = "shape"+mod;
+        //String variableValue = "coin";
         allowedShapeButton.setBackgroundResource(getResources().getIdentifier(variableValue, "drawable", getPackageName()));
     }
 
