@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.MobileAds;
+
 public class ChoosLvlActivity extends AppCompatActivity {
     private GridView levelsGidView;
     private int levelNo;
@@ -17,6 +19,7 @@ public class ChoosLvlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choos_lvl);
+
 
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 0);
