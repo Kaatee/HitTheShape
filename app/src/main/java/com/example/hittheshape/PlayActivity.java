@@ -37,6 +37,7 @@ public class PlayActivity extends AppCompatActivity {
     private int levelNo;
     private int size;
     private int lives;
+    private boolean checkLives;
     private Handler handler = new Handler();
     private ImageView[] livesViews;
     private InterstitialAd interstitialAd;
@@ -60,6 +61,7 @@ public class PlayActivity extends AppCompatActivity {
                 Intent intent = new Intent(context, PlayActivity.class);
                 intent.putExtra("levelNo", levelNo);
                 intent.putExtra("lives", lives);
+                intent.putExtra("checkLives", checkLives);
                 startActivity(intent);
                 interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build());
             }
@@ -69,6 +71,11 @@ public class PlayActivity extends AppCompatActivity {
         if(getIntent()!=null){
             levelNo=getIntent().getIntExtra("levelNo", 1);
             lives = getIntent().getIntExtra("lives", 3);
+            checkLives = getIntent().getBooleanExtra("checkLives", true);
+        }
+
+        if(levelNo%5 == 0 && checkLives){
+            lives = 3;
         }
 
         allowedShapeButton = (GifImageView)findViewById(R.id.shape);
@@ -132,10 +139,12 @@ public class PlayActivity extends AppCompatActivity {
             showLostRoundStatement();
         }
         else{
+            checkLives = false;
             handler.removeCallbacksAndMessages(null); ///////
             Intent intent = new Intent(context, PlayActivity.class);
             intent.putExtra("levelNo", levelNo);
             intent.putExtra("lives", lives);
+            intent.putExtra("checkLives", checkLives);
             startActivity(intent);
         }
     }
@@ -152,6 +161,7 @@ public class PlayActivity extends AppCompatActivity {
                 }
                 else if(!clicked && !endLevel){
                     lives--;
+                    checkLives = false;
                     if(lives>=0) {
                         livesViews[lives].setVisibility(View.INVISIBLE);
                     }
@@ -165,6 +175,7 @@ public class PlayActivity extends AppCompatActivity {
                         Intent intent = new Intent(context, PlayActivity.class);
                         intent.putExtra("levelNo", levelNo);
                         intent.putExtra("lives", lives);
+                        intent.putExtra("checkLives", checkLives);
                         startActivity(intent);
                     }
                 }
@@ -235,7 +246,7 @@ public class PlayActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Do nothing but close the dialog
-
+                        checkLives = false;
                         if(interstitialAd.isLoaded()){
                             interstitialAd.show();
                         }
@@ -243,6 +254,7 @@ public class PlayActivity extends AppCompatActivity {
                             Intent intent = new Intent(context, PlayActivity.class);
                             intent.putExtra("levelNo", levelNo);
                             intent.putExtra("lives", lives);
+                            intent.putExtra("checkLives", checkLives);
                             startActivity(intent);
                             dialog.dismiss();
                         }
@@ -255,6 +267,7 @@ public class PlayActivity extends AppCompatActivity {
                         Intent intent = new Intent(context, ChoosLvlActivity.class);
                         intent.putExtra("levelNo", levelNo);
                         intent.putExtra("lives", lives);
+                        intent.putExtra("checkLives", checkLives);
 
                         startActivity(intent);
                         // Do nothing
@@ -318,9 +331,11 @@ public class PlayActivity extends AppCompatActivity {
                     .setCancelable(false)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            checkLives = true;
                             Intent intent = new Intent(context, PlayActivity.class);
                             intent.putExtra("levelNo", levelNo+1);
                             intent.putExtra("lives", lives);
+                            intent.putExtra("checkLives", checkLives);
 
                             startActivity(intent);
                         }
