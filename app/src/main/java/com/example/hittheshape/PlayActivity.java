@@ -18,6 +18,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 import java.util.Random;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -35,6 +39,7 @@ public class PlayActivity extends AppCompatActivity {
     private int lives;
     private Handler handler = new Handler();
     private ImageView[] livesViews;
+    private InterstitialAd interstitialAd;
 
 
 
@@ -43,6 +48,22 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+        //adding adds
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build());
+
+
+        interstitialAd.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed(){
+                Intent intent = new Intent(context, PlayActivity.class);
+                intent.putExtra("levelNo", levelNo);
+                intent.putExtra("lives", lives);
+                startActivity(intent);
+                interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build());
+            }
+        });
 
         //check current level number
         if(getIntent()!=null){
@@ -203,13 +224,17 @@ public class PlayActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Do nothing but close the dialog
-                        Intent intent = new Intent(context, PlayActivity.class);
-                        intent.putExtra("levelNo", levelNo);
-                        intent.putExtra("lives", lives);
-                        //Log.e("haha", lives+" ");
 
-                        startActivity(intent);
-                        dialog.dismiss();
+                        if(interstitialAd.isLoaded()){
+                            interstitialAd.show();
+                        }
+                        else {
+                            Intent intent = new Intent(context, PlayActivity.class);
+                            intent.putExtra("levelNo", levelNo);
+                            intent.putExtra("lives", lives);
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
                     }
                 });
 

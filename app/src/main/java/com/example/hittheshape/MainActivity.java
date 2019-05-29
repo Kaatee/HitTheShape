@@ -3,6 +3,7 @@ package com.example.hittheshape;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -27,20 +28,20 @@ public class MainActivity extends AppCompatActivity {
         //AddMob - Google Adds
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
         mAdview = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
-       // AdRequest adRequest = new AdRequest.Builder().addTestDevice("336C7BC06BB587E1A7D28AA2724E204D").build(); //Kasia
-        //AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build();
+       //AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
 
         interstitialAd = new InterstitialAd(this);
         interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
-        interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build());
+        interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build());
+
 
         interstitialAd.setAdListener(new AdListener(){
             @Override
             public void onAdClosed(){
                 openChooseLvLActivity();
-                interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build());
+                interstitialAd.loadAd(new AdRequest.Builder().addTestDevice(Configuration.DEVICE_ID).build());
             }
         });
 
