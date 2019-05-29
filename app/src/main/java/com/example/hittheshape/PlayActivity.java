@@ -86,6 +86,7 @@ public class PlayActivity extends AppCompatActivity {
         setShapeRoundImage();
 
         formatShapes();
+        drawAllowedShapeAtNewPosition();
 
         //check forbidden shape in first move
         if (randWithGivenProbability(Configuration.probabilityOfForbiddenShapeInRound[levelNo])) {
