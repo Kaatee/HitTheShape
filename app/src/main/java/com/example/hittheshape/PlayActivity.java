@@ -91,6 +91,7 @@ public class PlayActivity extends AppCompatActivity {
         //check forbidden shape in first move
         if (randWithGivenProbability(Configuration.probabilityOfForbiddenShapeInRound[levelNo])) {
             enableForbiddenShape();
+            drawForbiddenShapeAtNewPosition();
         } else {
             disableForbiddenShape();
         }
@@ -173,8 +174,12 @@ public class PlayActivity extends AppCompatActivity {
 
     private void drawAllowedShapeAtNewPosition(){
         Random r = new Random();
-        int newAllowedShapePositionX = r.nextInt(getScreenWidth() - allowedShapeButton.getWidth() - 20) + 10;
-        int newAllowedShapePositionY = r.nextInt(getScreenHeight() - allowedShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+        int newAllowedShapePositionX = 0;
+        int newAllowedShapePositionY = 0;
+        while((newAllowedShapePositionX<=120 && newAllowedShapePositionY <=40) || ((newAllowedShapePositionX + allowedShapeButton.getWidth())> (getScreenWidth()-65) && (newAllowedShapePositionY + allowedShapeButton.getHeight()) > (getScreenHeight()-65))) {
+            newAllowedShapePositionX = r.nextInt(getScreenWidth() - allowedShapeButton.getWidth() - 40) + 10;
+            newAllowedShapePositionY = r.nextInt(getScreenHeight() - allowedShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 40) + 10;
+        }
 
         allowedShapeButton.setX(newAllowedShapePositionX);
         allowedShapeButton.setY(newAllowedShapePositionY);
@@ -182,14 +187,19 @@ public class PlayActivity extends AppCompatActivity {
 
     private void drawForbiddenShapeAtNewPosition(){
         Random r = new Random();
-        int newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 20) + 10;
-        int newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+        int newForbiddenShapePositionX = 0;
+        int newForbiddenShapePositionY = 0;
 
-        //check overlapping
-        while (allowedShapeButton.getX()- size <= newForbiddenShapePositionX && newForbiddenShapePositionX <= allowedShapeButton.getX() + size && allowedShapeButton.getY() - size <= newForbiddenShapePositionY && newForbiddenShapePositionY <= allowedShapeButton.getY() + size) {
-            newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 20) + 10;
-            newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+        //check overlap lives || overlapping
+        while((newForbiddenShapePositionX <= 120 && newForbiddenShapePositionY <= 40) || (allowedShapeButton.getX()- size <= newForbiddenShapePositionX && newForbiddenShapePositionX <= allowedShapeButton.getX() + size && allowedShapeButton.getY() - size <= newForbiddenShapePositionY && newForbiddenShapePositionY <= allowedShapeButton.getY() + size) || ((newForbiddenShapePositionX+forbiddenShapeButton.getWidth()) > (getScreenWidth()-65) && (newForbiddenShapePositionY + forbiddenShapeButton.getHeight())> (getScreenHeight()-65))) {
+            newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 40) + 10;
+            newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 40) + 10;
         }
+//        //check overlapping
+//        while (allowedShapeButton.getX()- size <= newForbiddenShapePositionX && newForbiddenShapePositionX <= allowedShapeButton.getX() + size && allowedShapeButton.getY() - size <= newForbiddenShapePositionY && newForbiddenShapePositionY <= allowedShapeButton.getY() + size) {
+//            newForbiddenShapePositionX = r.nextInt(getScreenWidth() - forbiddenShapeButton.getWidth() - 20) + 10;
+//            newForbiddenShapePositionY = r.nextInt(getScreenHeight() - forbiddenShapeButton.getHeight() - getNavigationBarHeight() - getStatusBarHeight() - 20) + 10;
+//        }
 
         forbiddenShapeButton.setX(newForbiddenShapePositionX);
         forbiddenShapeButton.setY(newForbiddenShapePositionY);

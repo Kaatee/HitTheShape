@@ -66,12 +66,10 @@
         android:id="@+id/forbiddenshape"
         android:layout_width="175dp"
         android:layout_height="196dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/forbidden_shape"
         android:onClick="hitForbiddenShape"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="519dp" />
 
 
 
